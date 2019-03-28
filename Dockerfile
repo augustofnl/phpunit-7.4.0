@@ -1,8 +1,6 @@
 # PHPUnit Docker Container.
 FROM alpine:3.8
 
-ENV PEAR_PACKAGES foo
-
 WORKDIR /tmp
 
 RUN apk --no-cache add \
@@ -42,9 +40,6 @@ RUN apk --no-cache add \
         php7-zip \
         php7-zlib \
         unzip \
-    && php -r "copy('https://pear.php.net/go-pear.phar', 'go-pear.phar');" \
-    && php go-pear.phar \
-    && php -r "unlink('go-pear.phar');" \
     && php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
     && php composer-setup.php --install-dir=/usr/bin --filename=composer \
     && php -r "unlink('composer-setup.php');" \
@@ -55,11 +50,6 @@ RUN apk --no-cache add \
     # Enable X-Debug
     && sed -i 's/\;z/z/g' /etc/php7/conf.d/xdebug.ini \
     && php -m | grep -i xdebug
-
-ONBUILD RUN \
-    { \
-        [ "${PEAR_PACKAGES}" != "foo" ]; \
-    } || exit 0 && pear install ${PEAR_PACKAGES}
 
 VOLUME ["/app"]
 WORKDIR /app
